@@ -1,5 +1,8 @@
 import { NativeScriptModule } from "nativescript-angular/nativescript.module";
-import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
+import { CommonModule } from '@angular/common';
+import { throwIfAlreadyLoaded } from './core/module-import-guard';
+
+import { NgModule, NO_ERRORS_SCHEMA, Optional, SkipSelf  } from "@angular/core";
 import { NativeScriptHttpModule } from "nativescript-angular/http";
 import { NativeScriptRouterModule } from "nativescript-angular/router";
 
@@ -10,13 +13,15 @@ import { setStatusBarColors, BackendService, LoginService } from "./shared";
 import { LoginModule } from "./login/login.module";
 import { GroceriesModule } from "./groceries/groceries.module";
 
+
+
 setStatusBarColors();
 
 @NgModule({
   providers: [
     BackendService,
     LoginService,
-    authProviders
+    authProviders,
   ],
   imports: [
     NativeScriptModule,
@@ -25,6 +30,7 @@ setStatusBarColors();
     NativeScriptRouterModule.forRoot(appRoutes),
     LoginModule,
     GroceriesModule,
+    CommonModule
   ],
   declarations: [
       AppComponent,
@@ -32,4 +38,8 @@ setStatusBarColors();
   bootstrap: [AppComponent],
   schemas: [NO_ERRORS_SCHEMA]
 })
-export class AppModule { }
+export class AppModule {
+    constructor(@Optional() @SkipSelf() parentModule: AppModule) {
+        throwIfAlreadyLoaded(parentModule, 'AppModule');
+    }
+}
